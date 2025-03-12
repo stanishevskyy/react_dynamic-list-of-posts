@@ -14,28 +14,35 @@ import * as dataService from './services/dataServices';
 import { User } from './types/User';
 import { Post } from './types/Post';
 import { Comment } from './types/Comment';
+import { CommentData } from './types/Comment';
 
 export const App = () => {
-  const [usersLoaded, setUsersLoaded] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [selectedUserPost, setSelectedUserPost] = useState<Post | null>(null);
 
-  const [userComment, setUserComment] = useState<Comment[]>([]);
+  const [userComments, setUserComments] = useState<Comment[]>([]);
   const [isCommentLoading, setIsCommentLoading] = useState(false);
-  const [errorMessageCm, setErrorMessageCm] = useState('');
+  const [commentErrorMessage, setCommentErrorMessage] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [generalErrorMessage, setGeneralErrorMessage] = useState('');
+
+  const isNoPost =
+    userPosts.length === 0 &&
+    !isLoading &&
+    !generalErrorMessage &&
+    selectedUser;
 
   useEffect(() => {
-    dataService.getUsers().then(setUsersLoaded);
+    dataService.getUsers().then(setUsers);
   }, []);
 
   const loadUserPost = (userId: number): Promise<void> => {
-    setErrorMessage('');
+    setGeneralErrorMessage('');
     setIsLoading(true);
     setSelectedUserPost(null);
 
@@ -43,7 +50,7 @@ export const App = () => {
       .getUserPost(userId)
       .then(setUserPosts)
       .catch(() => {
-        setErrorMessage('Something went wrong!');
+        setGeneralErrorMessage('Something went wrong!');
         setUserPosts([]);
       })
       .finally(() => setIsLoading(false));
@@ -55,12 +62,31 @@ export const App = () => {
     return dataService
       .getUserComment(postId)
       .then((comments: Comment[]) => {
-        setUserComment(comments);
+        setUserComments(comments);
       })
       .catch(() => {
-        setErrorMessageCm('Something went wrong!');
+        setCommentErrorMessage('Something went wrong!');
       })
       .finally(() => setIsCommentLoading(false));
+  };
+
+  const createNewComment = (
+    postId: number,
+    { name, email, body }: CommentData,
+  ) => {
+    const newComment = { name, email, body, postId };
+
+    return dataService
+      .createComment(newComment)
+      .then(comment => setUserComments(prev => [...prev, comment]));
+  };
+
+  const deleteComment = (commentId: number) => {
+    dataService.deleteComment(commentId).then(() => {
+      setUserComments(currentComment => {
+        return currentComment.filter(comment => comment.id !== commentId);
+      });
+    });
   };
 
   return (
@@ -71,7 +97,7 @@ export const App = () => {
             <div className="tile is-child box is-success">
               <div className="block">
                 <UserSelector
-                  usersLoaded={usersLoaded}
+                  users={users}
                   selectedUser={selectedUser}
                   onClickSelect={setSelectedUser}
                   loadUserPost={loadUserPost}
@@ -83,27 +109,19 @@ export const App = () => {
                   <p data-cy="NoSelectedUser">No user selected</p>
                 )}
                 {isLoading && <Loader />}
-                {errorMessage && !isLoading && (
+                {generalErrorMessage && !isLoading && (
                   <div
                     className="notification is-danger"
                     data-cy="PostsLoadingError"
                   >
-                    {errorMessage}
+                    {generalErrorMessage}
                   </div>
                 )}
-
-                {userPosts.length === 0 &&
-                  !isLoading &&
-                  !errorMessage &&
-                  selectedUser && (
-                    <div
-                      className="notification is-warning"
-                      data-cy="NoPostsYet"
-                    >
-                      No posts yet
-                    </div>
-                  )}
-
+                {isNoPost && (
+                  <div className="notification is-warning" data-cy="NoPostsYet">
+                    No posts yet
+                  </div>
+                )}
                 {userPosts.length > 0 && !isLoading && (
                   <PostsList
                     userPosts={userPosts}
@@ -130,12 +148,14 @@ export const App = () => {
             <div className="tile is-child box is-success ">
               {selectedUserPost && (
                 <PostDetails
-                  userComment={userComment}
+                  userComments={userComments}
                   selectedUserPost={selectedUserPost}
-                  errorMessageCm={errorMessageCm}
+                  commentErrorMessage={commentErrorMessage}
                   isCommentLoading={isCommentLoading}
                   isFormOpen={isFormOpen}
                   setIsFormOpen={setIsFormOpen}
+                  createNewComment={createNewComment}
+                  deleteComment={deleteComment}
                 />
               )}
             </div>

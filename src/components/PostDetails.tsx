@@ -2,25 +2,38 @@ import React from 'react';
 import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
-import { Comment } from '../types/Comment';
+import { Comment, CommentData } from '../types/Comment';
 
 type Props = {
   isFormOpen: boolean;
   setIsFormOpen: (value: boolean) => void;
   selectedUserPost: Post;
-  errorMessageCm: string;
-  userComment: Comment[];
+  commentErrorMessage: string;
+  userComments: Comment[];
   isCommentLoading: boolean;
+  createNewComment: (
+    currentPostId: number,
+    { name, email, body }: CommentData,
+  ) => Promise<void>;
+  deleteComment: (commentId: number) => void;
 };
 
 export const PostDetails: React.FC<Props> = ({
   isFormOpen,
   setIsFormOpen,
   selectedUserPost,
-  errorMessageCm,
-  userComment,
+  commentErrorMessage,
+  userComments,
   isCommentLoading,
+  createNewComment,
+  deleteComment,
 }) => {
+  const isNoComments =
+    !isCommentLoading && userComments.length === 0 && !commentErrorMessage;
+
+  const isCommentListAvailable =
+    userComments.length > 0 && !isCommentLoading && !commentErrorMessage;
+
   return (
     <div className="content" data-cy="PostDetails">
       <div className="content" data-cy="PostDetails">
@@ -35,23 +48,23 @@ export const PostDetails: React.FC<Props> = ({
         <div className="block">
           {isCommentLoading && <Loader />}
 
-          {!isCommentLoading && errorMessageCm && (
+          {!isCommentLoading && commentErrorMessage && (
             <div className="notification is-danger" data-cy="CommentsError">
-              {errorMessageCm}
+              {commentErrorMessage}
             </div>
           )}
 
-          {!isCommentLoading && userComment.length === 0 && !errorMessageCm && (
+          {isNoComments && (
             <p className="title is-4" data-cy="NoCommentsMessage">
               No comments yet
             </p>
           )}
 
-          {userComment.length > 0 && !isCommentLoading && !errorMessageCm && (
+          {isCommentListAvailable && (
             <>
               {' '}
               <p className="title is-4">Comments:</p>
-              {userComment.map(comment => (
+              {userComments.map(comment => (
                 <article
                   className="message is-small"
                   data-cy="Comment"
@@ -66,6 +79,7 @@ export const PostDetails: React.FC<Props> = ({
                       type="button"
                       className="delete is-small"
                       aria-label="delete"
+                      onClick={() => deleteComment(comment.id)}
                     >
                       delete button
                     </button>
@@ -79,7 +93,7 @@ export const PostDetails: React.FC<Props> = ({
             </>
           )}
 
-          {!isCommentLoading && !isFormOpen && !errorMessageCm && (
+          {!isCommentLoading && !isFormOpen && !commentErrorMessage && (
             <button
               data-cy="WriteCommentButton"
               type="button"
@@ -91,7 +105,12 @@ export const PostDetails: React.FC<Props> = ({
           )}
         </div>
 
-        {isFormOpen && !isCommentLoading && <NewCommentForm />}
+        {isFormOpen && !isCommentLoading && (
+          <NewCommentForm
+            createNewComment={createNewComment}
+            currentPostId={selectedUserPost.id}
+          />
+        )}
       </div>
     </div>
   );

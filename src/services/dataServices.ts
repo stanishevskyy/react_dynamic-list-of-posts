@@ -15,3 +15,21 @@ export function getUserPost(userId: number): Promise<Post[]> {
 export function getUserComment(postId: number): Promise<Comment[]> {
   return client.get<Comment[]>(`/comments?postId=${postId}`);
 }
+
+export function createComment({
+  name,
+  email,
+  body,
+  postId,
+}: Omit<Comment, 'id'>) {
+  return client.post<Comment>(`	/comments/`, {
+    name,
+    email,
+    body,
+    postId,
+  });
+}
+
+export function deleteComment(commentId: number) {
+  return client.delete(`/comments/${commentId}`);
+}

@@ -11,12 +11,14 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
     'plugin:cypress/recommended',
+    '@mate-academy/eslint-config-react-typescript',
   ],
   overrides: [
     {
       files: ['**/*.spec.jsx'],
       rules: {
         'react/jsx-filename-extension': ['off'],
+        indent: 'off',
       },
     },
   ],
