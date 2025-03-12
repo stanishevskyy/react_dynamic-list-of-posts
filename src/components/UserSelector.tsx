@@ -24,7 +24,10 @@ export const UserSelector: React.FC<Props> = ({
   };
 
   return (
-    <div data-cy="UserSelector" className="dropdown is-active">
+    <div
+      data-cy="UserSelector"
+      className={classNames('dropdown', { 'is-active': isDropDownOpen })}
+    >
       <div className="dropdown-trigger">
         <button
           type="button"
@@ -41,24 +44,22 @@ export const UserSelector: React.FC<Props> = ({
         </button>
       </div>
 
-      {isDropDownOpen && (
-        <div className="dropdown-menu" id="dropdown-menu" role="menu">
-          <div className="dropdown-content">
-            {usersLoaded.map(user => (
-              <a
-                href={`#user-${user.id}`}
-                className={classNames('dropdown-item', {
-                  'is-active': selectedUser?.id === user.id,
-                })}
-                key={user.id}
-                onClick={() => handleClickSelect(user)}
-              >
-                {user.name}
-              </a>
-            ))}
-          </div>
+      <div className="dropdown-menu" id="dropdown-menu" role="menu">
+        <div className="dropdown-content">
+          {usersLoaded.map(user => (
+            <a
+              href={`#user-${user.id}`}
+              className={classNames('dropdown-item', {
+                'is-active': selectedUser?.id === user.id,
+              })}
+              key={user.id}
+              onClick={() => handleClickSelect(user)}
+            >
+              {user.name}
+            </a>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };

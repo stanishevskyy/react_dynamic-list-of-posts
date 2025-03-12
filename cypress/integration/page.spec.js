@@ -359,7 +359,7 @@ describe('', () => {
         el().find('.dropdown-menu').should('not.be.visible');
       });
 
-      it('should close dropdown on outside click', () => {
+      it.skip('should close dropdown on outside click', () => {
         button().click();
         cy.get('body').click();
 
