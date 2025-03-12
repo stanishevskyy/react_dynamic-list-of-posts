@@ -5,6 +5,7 @@ import classNames from 'classnames';
 type Props = {
   userPosts: Post[];
   selectedUserPost: Post | null;
+  setIsFormOpen: (value: boolean) => void;
   setSelectedUserPost: (value: Post | null) => void;
   loadUserComment: (value: number) => Promise<void>;
 };
@@ -12,12 +13,14 @@ type Props = {
 export const PostsList: React.FC<Props> = ({
   userPosts,
   selectedUserPost,
+  setIsFormOpen,
   setSelectedUserPost,
   loadUserComment,
 }) => {
   const handleBtnClick = (post: Post) => {
     setSelectedUserPost(post.id === selectedUserPost?.id ? null : post);
     loadUserComment(post.id);
+    setIsFormOpen(false);
   };
 
   return (

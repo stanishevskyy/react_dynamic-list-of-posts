@@ -13,6 +13,7 @@ import { Loader } from './components/Loader';
 import * as dataService from './services/dataServices';
 import { User } from './types/User';
 import { Post } from './types/Post';
+import { Comment } from './types/Comment';
 
 export const App = () => {
   const [usersLoaded, setUsersLoaded] = useState<User[]>([]);
@@ -24,6 +25,7 @@ export const App = () => {
   const [userComment, setUserComment] = useState<Comment[]>([]);
   const [isCommentLoading, setIsCommentLoading] = useState(false);
   const [errorMessageCm, setErrorMessageCm] = useState('');
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -47,12 +49,14 @@ export const App = () => {
       .finally(() => setIsLoading(false));
   };
 
-  const loadUserComment = (postId: number): Promise<void> => {
+  const loadUserComment = (postId: number) => {
     setIsCommentLoading(true);
 
     return dataService
       .getUserComment(postId)
-      .then(setUserComment)
+      .then((comments: Comment[]) => {
+        setUserComment(comments);
+      })
       .catch(() => {
         setErrorMessageCm('Something went wrong!');
       })
@@ -104,6 +108,7 @@ export const App = () => {
                   <PostsList
                     userPosts={userPosts}
                     selectedUserPost={selectedUserPost}
+                    setIsFormOpen={setIsFormOpen}
                     setSelectedUserPost={setSelectedUserPost}
                     loadUserComment={loadUserComment}
                   />
@@ -125,10 +130,12 @@ export const App = () => {
             <div className="tile is-child box is-success ">
               {selectedUserPost && (
                 <PostDetails
+                  userComment={userComment}
                   selectedUserPost={selectedUserPost}
                   errorMessageCm={errorMessageCm}
-                  userComment={userComment}
                   isCommentLoading={isCommentLoading}
+                  isFormOpen={isFormOpen}
+                  setIsFormOpen={setIsFormOpen}
                 />
               )}
             </div>

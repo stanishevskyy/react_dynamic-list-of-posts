@@ -2,8 +2,11 @@ import React from 'react';
 import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
+import { Comment } from '../types/Comment';
 
 type Props = {
+  isFormOpen: boolean;
+  setIsFormOpen: (value: boolean) => void;
   selectedUserPost: Post;
   errorMessageCm: string;
   userComment: Comment[];
@@ -11,6 +14,8 @@ type Props = {
 };
 
 export const PostDetails: React.FC<Props> = ({
+  isFormOpen,
+  setIsFormOpen,
   selectedUserPost,
   errorMessageCm,
   userComment,
@@ -36,49 +41,57 @@ export const PostDetails: React.FC<Props> = ({
             </div>
           )}
 
-          {!isCommentLoading && userComment.length === 0 && (
+          {!isCommentLoading && userComment.length === 0 && !errorMessageCm && (
             <p className="title is-4" data-cy="NoCommentsMessage">
               No comments yet
             </p>
           )}
-          <p className="title is-4">Comments:</p>
 
-          {userComment.map(comment => (
-            <article
-              className="message is-small"
-              data-cy="Comment"
-              key={comment.id}
-            >
-              <div className="message-header">
-                <a href="mailto:misha@mate.academy" data-cy="CommentAuthor">
-                  Misha Hrynko
-                </a>
-                <button
-                  data-cy="CommentDelete"
-                  type="button"
-                  className="delete is-small"
-                  aria-label="delete"
+          {userComment.length > 0 && !isCommentLoading && !errorMessageCm && (
+            <>
+              {' '}
+              <p className="title is-4">Comments:</p>
+              {userComment.map(comment => (
+                <article
+                  className="message is-small"
+                  data-cy="Comment"
+                  key={comment.id}
                 >
-                  delete button
-                </button>
-              </div>
+                  <div className="message-header">
+                    <a href={`mailto:${comment.email}`} data-cy="CommentAuthor">
+                      {comment.name}
+                    </a>
+                    <button
+                      data-cy="CommentDelete"
+                      type="button"
+                      className="delete is-small"
+                      aria-label="delete"
+                    >
+                      delete button
+                    </button>
+                  </div>
 
-              <div className="message-body" data-cy="CommentBody">
-                Some comment
-              </div>
-            </article>
-          ))}
+                  <div className="message-body" data-cy="CommentBody">
+                    {comment.body}
+                  </div>
+                </article>
+              ))}
+            </>
+          )}
 
-          <button
-            data-cy="WriteCommentButton"
-            type="button"
-            className="button is-link"
-          >
-            Write a comment
-          </button>
+          {!isCommentLoading && !isFormOpen && !errorMessageCm && (
+            <button
+              data-cy="WriteCommentButton"
+              type="button"
+              className="button is-link"
+              onClick={() => setIsFormOpen(true)}
+            >
+              Write a comment
+            </button>
+          )}
         </div>
 
-        <NewCommentForm />
+        {isFormOpen && !isCommentLoading && <NewCommentForm />}
       </div>
     </div>
   );
