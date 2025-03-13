@@ -23,7 +23,7 @@ export const UserSelector: React.FC<Props> = ({
     setIsDropDownOpen(false);
   };
 
-  const handleClickDpopDown = (event: React.MouseEvent) => {
+  const handleClickDropDown = (event: React.MouseEvent) => {
     event.stopPropagation();
     setIsDropDownOpen(prev => !prev);
   };
@@ -51,7 +51,7 @@ export const UserSelector: React.FC<Props> = ({
           className="button"
           aria-haspopup="true"
           aria-controls="dropdown-menu"
-          onClick={handleClickDpopDown}
+          onClick={handleClickDropDown}
         >
           <span>{selectedUser ? selectedUser.name : 'Choose a user'}</span>
 

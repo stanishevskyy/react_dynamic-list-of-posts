@@ -22,7 +22,7 @@ export function createComment({
   body,
   postId,
 }: Omit<Comment, 'id'>) {
-  return client.post<Comment>(`	/comments/`, {
+  return client.post<Comment>(`/comments/`, {
     name,
     email,
     body,

@@ -82,11 +82,14 @@ export const App = () => {
   };
 
   const deleteComment = (commentId: number) => {
-    dataService.deleteComment(commentId).then(() => {
-      setUserComments(currentComment => {
-        return currentComment.filter(comment => comment.id !== commentId);
-      });
-    });
+    dataService
+      .deleteComment(commentId)
+      .then(() => {
+        setUserComments(currentComment => {
+          return currentComment.filter(comment => comment.id !== commentId);
+        });
+      })
+      .catch(() => setCommentErrorMessage('Failed to add comment'));
   };
 
   return (

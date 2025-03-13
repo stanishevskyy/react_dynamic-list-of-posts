@@ -23,7 +23,7 @@ export const NewCommentForm: React.FC<Props> = ({
   const [commentText, setCommentText] = useState('');
   const [commentError, setCommentError] = useState(false);
 
-  const [isSumbit, setIsSumbit] = useState(false);
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const handleInputFullName = (event: React.ChangeEvent<HTMLInputElement>) => {
     setErrorAuthor(false);
@@ -51,14 +51,14 @@ export const NewCommentForm: React.FC<Props> = ({
 
   const handleSubmit = (event: React.FormEvent) => {
     event?.preventDefault();
-    setIsSumbit(true);
+    setIsSubmit(true);
 
     setErrorAuthor(!authorFullName);
     setEmailError(!authorEmail);
     setCommentError(!commentText);
 
     if (!authorFullName || !authorEmail || !commentText) {
-      setIsSumbit(false);
+      setIsSubmit(false);
 
       return;
     }
@@ -67,7 +67,7 @@ export const NewCommentForm: React.FC<Props> = ({
       name: authorFullName,
       email: authorEmail,
       body: commentText,
-    }).finally(() => setIsSumbit(false));
+    }).finally(() => setIsSubmit(false));
 
     setCommentText('');
   };
@@ -175,7 +175,7 @@ export const NewCommentForm: React.FC<Props> = ({
         <div className="control">
           <button
             type="submit"
-            className={classNames(`button is-link`, { 'is-loading': isSumbit })}
+            className={classNames(`button is-link`, { 'is-loading': isSubmit })}
           >
             Add
           </button>
